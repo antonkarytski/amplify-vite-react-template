@@ -2,9 +2,17 @@ import * as React from 'react'
 
 import { cn } from '../lib/cn/utils'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+type InputProps = React.ComponentProps<'input'> & {
+  initialValue?: string
+}
+
+export function Input({ className, type, initialValue, ...props }: InputProps) {
   return (
     <input
+      ref={(element) => {
+        if (!element || element.value || !initialValue) return
+        element.value = initialValue
+      }}
       type={type}
       data-slot="input"
       className={cn(
@@ -17,5 +25,3 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
     />
   )
 }
-
-export { Input }

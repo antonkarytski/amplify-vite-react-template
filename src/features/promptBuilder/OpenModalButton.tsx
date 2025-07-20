@@ -7,7 +7,11 @@ export const OpenModalButton = ({}: OpenModalButtonProps) => {
   return (
     <Button
       variant={'outline'}
-      onClick={() => promptsBuilderModel.modal.modalStateChanged(true)}
+      onClick={() =>
+        promptsBuilderModel.modal.modalStateChanged({
+          mode: 'create',
+        })
+      }
       className="btn"
     >
       New Prompt

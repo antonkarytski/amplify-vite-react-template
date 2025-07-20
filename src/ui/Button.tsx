@@ -37,6 +37,13 @@ const buttonVariants = cva(
       size: 'default',
       state: 'default',
     },
+    compoundVariants: [
+      {
+        variant: 'outline',
+        state: 'active',
+        class: 'border-2 border-black',
+      },
+    ],
   },
 )
 

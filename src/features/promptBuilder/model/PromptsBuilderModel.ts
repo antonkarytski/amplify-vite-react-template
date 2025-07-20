@@ -7,6 +7,11 @@ export type AddPromptProps = Omit<
   'createdAt' | 'updatedAt' | 'id'
 >
 
+export type EditPromptProps = {
+  prompt: IPromptEntity
+  updates: AddPromptProps
+}
+
 const INITIAL_PROMPTS: IPromptEntity[] = [
   {
     name: 'One',
@@ -68,6 +73,10 @@ export class PromptsBuilderModel {
   })
 
   public readonly promptAdded = this.domain.event<AddPromptProps>('promptAdded')
+  public readonly promptEdited =
+    this.domain.event<EditPromptProps>('promptEdited')
+  public readonly promptRemoved =
+    this.domain.event<IPromptEntity>('promptRemoved')
   public readonly $prompts = this.domain
     .store<IPromptEntity[]>(INITIAL_PROMPTS, {
       name: 'prompts',
@@ -78,5 +87,20 @@ export class PromptsBuilderModel {
         ...store,
         { ...prompt, createdAt: now, updatedAt: now, id: now.toString() },
       ]
+    })
+    .on(this.promptEdited, (state, { prompt, updates }) => {
+      const now = new Date().valueOf()
+      const index = state.findIndex((p) => p === prompt)
+      if (index === -1) return state
+      const copy = [...state]
+      copy[index] = { ...prompt, ...updates, updatedAt: now }
+      return copy
+    })
+    .on(this.promptRemoved, (state, prompt) => {
+      const index = state.findIndex((p) => p === prompt)
+      if (index === -1) return state
+      const copy = [...state]
+      copy.splice(index, 1)
+      return copy
     })
 }

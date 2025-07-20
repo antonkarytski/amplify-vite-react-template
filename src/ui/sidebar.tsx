@@ -7,7 +7,7 @@ import { PanelLeftIcon } from 'lucide-react'
 import { useIsMobile } from '../hooks/use-mobile'
 import { cn } from '../lib/cn/utils'
 import { Button } from './Button'
-import { Input } from './input'
+import { Input } from './Input'
 import { Separator } from './separator'
 import { Skeleton } from './skeleton'
 import {

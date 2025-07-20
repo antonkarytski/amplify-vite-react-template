@@ -1,68 +1,82 @@
-import { useRef } from 'react'
+import { useState } from 'react'
 import type { AddPromptProps } from './model/PromptsBuilderModel'
+import { Input } from '../../ui/Input'
+import { Textarea } from '../../ui/Textarea'
+import { Button } from '../../ui/Button'
+import type { IPromptEntity } from '../../api/prompts.types'
 
 type PromptFormProps = {
   onCancel: VoidFunction
   onSubmit: (data: AddPromptProps) => void
+  initialValues?: IPromptEntity
 }
 
-export function PromptForm({ onCancel, onSubmit }: PromptFormProps) {
-  const values = useRef({
-    name: '',
-    prompt: '',
-    tags: '',
-    note: '',
-    replacements: '',
-  })
+export function PromptForm({
+  onCancel,
+  onSubmit,
+  initialValues,
+}: PromptFormProps) {
+  const [values] = useState(() => ({
+    name: initialValues?.name ?? '',
+    prompt: initialValues?.prompt ?? '',
+    tags: initialValues?.tags?.join(', ') ?? '',
+    note: initialValues?.note ?? '',
+    replacements: initialValues?.replacements?.join(', ') ?? '',
+  }))
 
   const handleSubmit = () => {
     onSubmit({
-      name: values.current.name,
-      prompt: values.current.prompt,
-      tags: values.current.tags
-        ? values.current.tags.split(',').map((t) => t.trim())
+      name: values.name,
+      prompt: values.prompt,
+      tags: values.tags
+        ? values.tags.split(',').map((t) => t.trim())
         : undefined,
-      note: values.current.note,
-      replacements: values.current.replacements
-        ? values.current.replacements.split(',').map((r) => r.trim())
+      note: values.note,
+      replacements: values.replacements
+        ? values.replacements.split(',').map((r) => r.trim())
         : undefined,
     })
   }
 
   return (
     <div className="space-y-4">
-      <input
-        onChange={(e) => (values.current.name = e.target.value)}
+      <Input
+        onChange={(e) => (values.name = e.target.value)}
         placeholder="Name"
         className="input w-full"
+        initialValue={values.name}
       />
-      <textarea
-        onChange={(e) => (values.current.prompt = e.target.value)}
+      <Textarea
+        onChange={(e) => (values.prompt = e.target.value)}
         placeholder="Prompt text"
         className="textarea w-full"
+        initialValue={values.prompt}
       />
-      <input
-        onChange={(e) => (values.current.tags = e.target.value)}
+      <Input
+        onChange={(e) => (values.tags = e.target.value)}
         placeholder="Tags (comma separated)"
         className="input w-full"
+        initialValue={values.tags}
       />
-      <input
-        onChange={(e) => (values.current.note = e.target.value)}
+      <Input
+        onChange={(e) => (values.note = e.target.value)}
         placeholder="Note"
         className="input w-full"
+        initialValue={values.note}
       />
-      <input
-        onChange={(e) => (values.current.replacements = e.target.value)}
+      <Input
+        onChange={(e) => (values.replacements = e.target.value)}
         placeholder="Replacements (comma separated)"
         className="input w-full"
+        initialValue={values.replacements}
       />
       <div className="flex justify-end gap-2">
-        <button onClick={onCancel} className="btn">
+        <Button onClick={onCancel} className="btn">
           Cancel
-        </button>
-        <button onClick={handleSubmit} className="btn btn-primary">
+        </Button>
+        <Button onClick={handleSubmit} className="btn btn-primary bg-green-600">
           Save
-        </button>
+        </Button>
       </div>
     </div>
   )

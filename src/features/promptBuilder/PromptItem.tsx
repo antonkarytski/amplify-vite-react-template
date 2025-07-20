@@ -1,6 +1,8 @@
 import type { IPromptEntity } from '../../api/prompts.types'
 import { Button } from '../../ui/Button'
 import { EditIcon, PlayIcon, TrashIcon } from 'lucide-react'
+import { format } from 'date-fns'
+import { promptsBuilderModel } from './promptsBuilder.model'
 
 type PromptItemProps = {
   prompt: IPromptEntity
@@ -30,17 +32,31 @@ export default function PromptItem({ prompt }: PromptItemProps) {
         <p className="mt-2 text-sm">{prompt.note}</p>
       </div>
       <div className={'border-r-2 border-gray-300 pr-4 pl-4 flex-1'}>
-        <p className="mt-2 text-sm ">{new Date(prompt.createdAt).toString()}</p>
+        <p className="mt-2 text-sm ">
+          {format(new Date(prompt.createdAt), 'dd/MM/yyyy')}
+        </p>
       </div>
-      <div
-        className={
-          'border-r-2 border-gray-300 pr-4 pl-4 flex flex-1 gap-2 flex-col'
-        }
-      >
-        <Button variant={'outline'}>
+      <div className={'pl-4 flex flex-1 gap-2 flex-col'}>
+        <Button
+          onClick={() => {
+            promptsBuilderModel.modal.modalStateChanged({
+              mode: 'edit',
+              prompt,
+            })
+          }}
+          variant={'outline'}
+        >
           <EditIcon />
         </Button>
-        <Button variant={'outline'}>
+        <Button
+          onClick={() => {
+            promptsBuilderModel.modal.modalStateChanged({
+              mode: 'remove',
+              prompt,
+            })
+          }}
+          variant={'outline'}
+        >
           <TrashIcon color={'#c51a1a'} />
         </Button>
         <Button variant={'outline'}>
