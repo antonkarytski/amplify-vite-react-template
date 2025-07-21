@@ -29,7 +29,9 @@ export class PromptsCreatorModalModel {
   public constructor({ domain }: PromptsCreatorModelProps = {}) {
     this.domain = domainOrSub(PROMPTS_CREATOR_DOMAIN_NAME, domain)
 
-    this.modalStateChanged = this.domain.createEvent<PromptModalState | null>()
+    this.modalStateChanged = this.domain.createEvent<PromptModalState | null>(
+      'modalStateChanged',
+    )
     this.$modalState = this.domain
       .createStore<PromptModalState | null>(null, {
         name: 'isModalOpened',

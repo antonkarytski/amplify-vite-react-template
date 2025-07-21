@@ -4,19 +4,14 @@ export type ImageData = {
   height: number
   src: string
 }
-
-export type ImagePiece = {
+export type IParseResult = { front: string; back: string } | string
+export type IImagePiece = {
   id: number
   canvas: HTMLCanvasElement
   dataUrl: string
   startY: number
   endY: number
   height: number
+  parsedResult?: IParseResult | null
+  state?: 'parsing' | null
 }
-
-export type ParsedResults = Record<
-  number,
-  { front: string; back: string } | string
->
-
-export type ParsingStates = Record<number, boolean>

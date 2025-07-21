@@ -1,15 +1,25 @@
 import { attach, createDomain } from 'effector'
-import type { ImageData, ImagePiece } from '../types'
+import type { ImageData, IImagePiece } from '../types'
 import { ImageParserActionsModel } from './ImageParserActionsModel'
 import { calculateImageScale } from '../imageUtils'
+import { ImageParserApiModel } from './ImageParserApiModel'
 
 type DividerMovedProps = {
   index: number
   y: number
 }
 
+type PieceUpdatedProps = {
+  piece: IImagePiece
+  updates: {
+    state?: IImagePiece['state']
+    parsedResult?: IImagePiece['parsedResult']
+  }
+}
+
 export class ImageParserModel {
   public readonly actions: ImageParserActionsModel
+  public readonly api: ImageParserApiModel
 
   private readonly domain = createDomain('imageParser')
 
@@ -50,16 +60,28 @@ export class ImageParserModel {
     })
     .reset(this.dividersCleared)
 
+  public readonly pieceUpdated =
+    this.domain.event<PieceUpdatedProps>('pieceUpdated')
   public readonly piecesChanged =
-    this.domain.event<ImagePiece[]>('piecesChanged')
-  public readonly $imagePieces = this.domain.store<ImagePiece[]>([], {
-    name: '$imagePieces',
-  })
+    this.domain.event<IImagePiece[]>('piecesChanged')
+  public readonly $imagePieces = this.domain
+    .store<IImagePiece[]>([], {
+      name: '$imagePieces',
+    })
+    .on(this.piecesChanged, (_, payload) => payload)
+    .on(this.pieceUpdated, (state, { piece, updates }) => {
+      const index = state.findIndex((p) => p === piece)
+      if (index === -1) return state
+      const copy = [...state]
+      copy[index] = { ...copy[index], ...updates }
+      return copy
+    })
 
   public constructor() {
     this.actions = new ImageParserActionsModel({
       domain: this.domain,
     })
+    this.api = new ImageParserApiModel()
   }
 
   public readonly splitImageFx = attach({

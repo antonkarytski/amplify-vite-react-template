@@ -1,6 +1,7 @@
 import ImageUpload from './ImageUpload'
 import { ImageEditorContainer } from './ImageEditorContainer'
 import { imageParserModel } from './imageParser.model'
+import { ImagePiecesList } from './ImagePiecesList'
 
 type ImageRowSplitterProps = {}
 
@@ -13,14 +14,7 @@ export const ImageRowSplitter = ({}: ImageRowSplitterProps) => {
 
       <ImageUpload />
       <ImageEditorContainer />
-
-      {/*<SplitRowsList*/}
-      {/*  splitRows={splitRows}*/}
-      {/*  parsedResults={parsedResults}*/}
-      {/*  isParsingRows={isParsingRows}*/}
-      {/*  onUpdateParsedResults={updateParsedResults}*/}
-      {/*  onUpdateParsingState={updateParsingState}*/}
-      {/*/>*/}
+      <ImagePiecesList />
 
       <canvas ref={imageParserModel.actions.setCanvas} className="hidden" />
     </div>

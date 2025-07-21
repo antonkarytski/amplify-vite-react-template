@@ -1,4 +1,4 @@
-import { type ImageData, type ImagePiece } from './types'
+import { type ImageData, type IImagePiece } from './types'
 
 export const loadImageFromFile = (file: File): Promise<ImageData> => {
   return new Promise((resolve, reject) => {
@@ -53,7 +53,7 @@ export const splitImageAtDividers = (
   originalImage: ImageData,
   dividers: number[],
   canvas: HTMLCanvasElement,
-): ImagePiece[] => {
+): IImagePiece[] => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return []
 
@@ -67,7 +67,7 @@ export const splitImageAtDividers = (
     ...dividers.sort((a, b) => a - b),
     originalImage.height,
   ]
-  const rows: ImagePiece[] = []
+  const rows: IImagePiece[] = []
 
   for (let i = 0; i < sortedDividers.length - 1; i++) {
     const startY = Math.floor(sortedDividers[i])

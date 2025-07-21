@@ -17,8 +17,8 @@ export const sidebarConfig: SidebarConfig = {
       path: '/prompts',
     },
     {
-      label: 'Prompt Manager',
-      path: '/',
+      label: 'Image parser',
+      path: '/parser/row',
     },
   ],
 }

@@ -9,14 +9,12 @@ export function AppSidebar() {
   const navigate = useNavigate()
   const routerState = useRouterState()
 
-  console.log(routerState)
   return (
     <SidebarContainer>
       <SidebarHeader />
       <SidebarContent>
         <SidebarGroup className={'gap-2'}>
           {sidebarConfig.pages.map((page, index) => {
-            console.log(page)
             return (
               <Button
                 key={index}
