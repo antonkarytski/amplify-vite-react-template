@@ -1,6 +1,7 @@
-import { createDomain } from 'effector'
+import { createDomain, sample } from 'effector'
 import { PromptsCreatorModalModel } from './PromptsCreatorModalModel'
 import type { IPromptEntity } from '../../../api/prompts.types'
+import { client } from '../../../api/client'
 
 export type AddPromptProps = Omit<
   IPromptEntity,
@@ -103,4 +104,14 @@ export class PromptsBuilderModel {
       copy.splice(index, 1)
       return copy
     })
+
+  private readonly addPromptFx = this.domain.effect<AddPromptProps, void>(
+    (props) => {
+      client.models.Prompts.create(props)
+    },
+  )
+
+  public constructor() {
+    sample({ clock: this.promptAdded, target: this.addPromptFx })
+  }
 }

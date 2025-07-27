@@ -38,11 +38,13 @@ export class ImageParserModel {
     })
     .on(this.imageScaleChanged, (_, payload) => payload)
 
+  public readonly dividersCleared = this.domain.event('dividersCleared')
+  public readonly dividerMoveFinished = this.domain.event('dividerMoveFinished')
   public readonly dividerAdded = this.domain.event<number>('dividerAdded')
   public readonly dividerRemoved = this.domain.event<number>('dividerRemoved')
   public readonly dividerMoved =
     this.domain.event<DividerMovedProps>('dividerMoved')
-  public readonly dividersCleared = this.domain.event('dividersCleared')
+
   public readonly $dividers = this.domain
     .store<number[]>([], {
       name: '$dividers',
@@ -50,7 +52,10 @@ export class ImageParserModel {
     .on(this.dividerMoved, (state, { index, y }) => {
       const newDividers = [...state]
       newDividers[index] = y
-      return newDividers.sort((a, b) => a - b)
+      return newDividers
+    })
+    .on(this.dividerMoveFinished, (state) => {
+      return [...state].sort((a, b) => a - b)
     })
     .on(this.dividerRemoved, (state, index) => {
       return state.filter((_, i) => i !== index)
@@ -76,6 +81,7 @@ export class ImageParserModel {
       copy[index] = { ...copy[index], ...updates }
       return copy
     })
+    .reset(this.dividersCleared)
 
   public constructor() {
     this.actions = new ImageParserActionsModel({
@@ -114,6 +120,12 @@ export class ImageParserModel {
     setTimeout(updateScale, 100)
     window.addEventListener('resize', updateScale)
     return () => window.removeEventListener('resize', updateScale)
+  }
+
+  public readonly finishDividerDrag = () => {
+    if (this.actions.activeDividerIndex === -1) return
+    this.actions.setActiveDividerIndex(-1)
+    this.dividerMoveFinished()
   }
 }
 

@@ -7,6 +7,7 @@ type ImageEditorProps = {}
 
 export const ImageEditor = ({}: ImageEditorProps) => {
   const imageScale = useUnit(imageParserModel.$imageScale)
+  const originalImage = useUnit(imageParserModel.$originalImage)
   const dividers = useUnit(imageParserModel.$dividers)
 
   useEffect(() => {
@@ -14,18 +15,17 @@ export const ImageEditor = ({}: ImageEditorProps) => {
   }, [])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const image = imageParserModel.$originalImage.getState()
-    const imageScale = imageParserModel.$imageScale.getState()
     if (
       imageParserModel.actions.activeDividerIndex === -1 ||
-      !image ||
+      !originalImage ||
       !imageParserModel.actions.imageContainer
-    )
+    ) {
       return
+    }
 
     const rect = imageParserModel.actions.imageContainer.getBoundingClientRect()
     const y = e.clientY - rect.top
-    const actualY = Math.max(0, Math.min(image.height, y / imageScale))
+    const actualY = Math.max(0, Math.min(originalImage.height, y / imageScale))
     imageParserModel.dividerMoved({
       index: imageParserModel.actions.activeDividerIndex,
       y: actualY,
@@ -37,15 +37,19 @@ export const ImageEditor = ({}: ImageEditorProps) => {
       ref={imageParserModel.actions.setImageContainer}
       className="relative border rounded overflow-hidden cursor-crosshair select-none"
       onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-        const image = imageParserModel.$originalImage.getState()
-        if (!image || imageParserModel.actions.activeDividerIndex !== -1) return
+        if (
+          !originalImage ||
+          imageParserModel.actions.activeDividerIndex !== -1
+        ) {
+          return
+        }
 
         const rect = e.currentTarget.getBoundingClientRect()
-        imageParserModel.dividerAdded(e.clientY - rect.top)
+        imageParserModel.dividerAdded((e.clientY - rect.top) / imageScale)
       }}
       onMouseMove={handleMouseMove}
       onMouseUp={() => {
-        imageParserModel.actions.setActiveDividerIndex(-1)
+        imageParserModel.finishDividerDrag()
       }}
       style={{ userSelect: 'none' }}
     >

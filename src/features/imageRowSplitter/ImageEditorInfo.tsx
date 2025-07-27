@@ -1,9 +1,9 @@
 import { useUnit } from 'effector-react'
 import { imageParserModel } from './imageParser.model'
 
-type ImageEditorStatisticsProps = {}
+type ImageEditorInfoProps = {}
 
-export const ImageEditorStatistics = ({}: ImageEditorStatisticsProps) => {
+export const ImageEditorInfo = ({}: ImageEditorInfoProps) => {
   const image = useUnit(imageParserModel.$originalImage)
   const dividers = useUnit(imageParserModel.$dividers)
 
