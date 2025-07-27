@@ -3,8 +3,12 @@ import ReactDOM from 'react-dom/client'
 import './styles.css'
 import './styles/globals.css'
 import reportWebVitals from './reportWebVitals.ts'
-
 import App from './App.tsx'
+
+import outputs from '../amplify_outputs.json'
+import { Amplify } from 'aws-amplify'
+
+Amplify.configure(outputs)
 
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {

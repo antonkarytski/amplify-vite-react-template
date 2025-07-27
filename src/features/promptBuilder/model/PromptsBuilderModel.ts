@@ -13,6 +13,10 @@ export type EditPromptProps = {
   updates: AddPromptProps
 }
 
+type Subscription = {
+  unsubscribe: () => void
+}
+
 const INITIAL_PROMPTS: IPromptEntity[] = [
   {
     name: 'One',
@@ -78,10 +82,13 @@ export class PromptsBuilderModel {
     this.domain.event<EditPromptProps>('promptEdited')
   public readonly promptRemoved =
     this.domain.event<IPromptEntity>('promptRemoved')
+  private readonly promptChanged =
+    this.domain.event<IPromptEntity[]>('promptChanged')
   public readonly $prompts = this.domain
     .store<IPromptEntity[]>(INITIAL_PROMPTS, {
       name: 'prompts',
     })
+    .on(this.promptChanged, (prompts) => prompts)
     .on(this.promptAdded, (store, prompt) => {
       const now = new Date().valueOf()
       return [
@@ -105,13 +112,28 @@ export class PromptsBuilderModel {
       return copy
     })
 
-  private readonly addPromptFx = this.domain.effect<AddPromptProps, void>(
-    (props) => {
+  private readonly addPromptFx = this.domain.effect<AddPromptProps, void>({
+    handler: (props) => {
       client.models.Prompts.create(props)
     },
-  )
+    name: 'addPromptFx',
+  })
 
   public constructor() {
     sample({ clock: this.promptAdded, target: this.addPromptFx })
+  }
+
+  private currentSubscription: Subscription | null = null
+  public init() {
+    if (this.currentSubscription) return
+    console.log(client.models)
+    const subscription = client.models.Prompts.observeQuery().subscribe({
+      next: (data) => this.promptChanged(data.items as any),
+    })
+    this.currentSubscription = subscription
+    return () => {
+      subscription.unsubscribe()
+      this.currentSubscription = null
+    }
   }
 }
