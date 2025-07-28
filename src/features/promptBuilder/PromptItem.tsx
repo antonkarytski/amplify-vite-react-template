@@ -9,6 +9,7 @@ type PromptItemProps = {
 }
 
 export default function PromptItem({ prompt }: PromptItemProps) {
+  console.log(prompt.createdAt)
   return (
     <div className="border p-4 pb-4 rounded flex-row flex align-middle">
       <div className={'border-r-2 border-gray-300 pr-4 flex-4'}>
@@ -33,7 +34,7 @@ export default function PromptItem({ prompt }: PromptItemProps) {
       </div>
       <div className={'border-r-2 border-gray-300 pr-4 pl-4 flex-1'}>
         <p className="mt-2 text-sm ">
-          {format(new Date(prompt.createdAt), 'dd/MM/yyyy')}
+          {format(prompt.createdAt, 'dd/MM/yyyy')}
         </p>
       </div>
       <div className={'pl-4 flex flex-1 gap-2 flex-col'}>

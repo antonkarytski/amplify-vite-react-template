@@ -2,8 +2,8 @@ export type IPromptEntity = {
   id: string
   name: string
   prompt: string
-  createdAt: number
-  updatedAt: number
+  createdAt: string
+  updatedAt: string
   tags?: string[]
   note?: string
   replacements?: string[]

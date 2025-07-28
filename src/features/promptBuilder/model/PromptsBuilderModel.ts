@@ -17,59 +17,6 @@ type Subscription = {
   unsubscribe: () => void
 }
 
-const INITIAL_PROMPTS: IPromptEntity[] = [
-  {
-    name: 'One',
-    id: '1',
-    createdAt: Date.now(),
-    prompt: 'Write professional email to schedule a meeting',
-    updatedAt: Date.now(),
-    tags: ['email', 'meeting'],
-    note: 'This prompt is used to write emails for scheduling meetings.',
-    replacements: ['email', 'meeting'],
-  },
-  {
-    name: 'One',
-    id: '2',
-    createdAt: Date.now(),
-    prompt: 'Write professional email to schedule a meeting',
-    updatedAt: Date.now(),
-    tags: ['email', 'meeting'],
-    note: 'This prompt is used to write emails for scheduling meetings.',
-    replacements: ['email', 'meeting'],
-  },
-  {
-    name: 'One',
-    id: '3',
-    createdAt: Date.now(),
-    prompt: 'Write professional email to schedule a meeting',
-    updatedAt: Date.now(),
-    tags: ['email', 'meeting'],
-    note: 'This prompt is used to write emails for scheduling meetings.',
-    replacements: ['email', 'meeting'],
-  },
-  {
-    name: 'One',
-    id: '4',
-    createdAt: Date.now(),
-    prompt: 'Write professional email to schedule a meeting',
-    updatedAt: Date.now(),
-    tags: ['email', 'meeting'],
-    note: 'This prompt is used to write emails for scheduling meetings.',
-    replacements: ['email', 'meeting'],
-  },
-  {
-    name: 'One',
-    id: '5',
-    createdAt: Date.now(),
-    prompt: 'Write professional email to schedule a meeting',
-    updatedAt: Date.now(),
-    tags: ['email', 'meeting'],
-    note: 'This prompt is used to write emails for scheduling meetings.',
-    replacements: ['email', 'meeting'],
-  },
-]
-
 export class PromptsBuilderModel {
   private readonly domain = createDomain('promptsBuilder')
 
@@ -85,19 +32,19 @@ export class PromptsBuilderModel {
   private readonly promptChanged =
     this.domain.event<IPromptEntity[]>('promptChanged')
   public readonly $prompts = this.domain
-    .store<IPromptEntity[]>(INITIAL_PROMPTS, {
+    .store<IPromptEntity[]>([], {
       name: 'prompts',
     })
-    .on(this.promptChanged, (prompts) => prompts)
+    .on(this.promptChanged, (_, prompts) => prompts)
     .on(this.promptAdded, (store, prompt) => {
-      const now = new Date().valueOf()
+      const now = new Date().toString()
       return [
         ...store,
         { ...prompt, createdAt: now, updatedAt: now, id: now.toString() },
       ]
     })
     .on(this.promptEdited, (state, { prompt, updates }) => {
-      const now = new Date().valueOf()
+      const now = new Date().toString()
       const index = state.findIndex((p) => p === prompt)
       if (index === -1) return state
       const copy = [...state]
@@ -113,14 +60,31 @@ export class PromptsBuilderModel {
     })
 
   private readonly addPromptFx = this.domain.effect<AddPromptProps, void>({
+    name: 'addPromptFx',
     handler: (props) => {
       client.models.Prompts.create(props)
     },
-    name: 'addPromptFx',
+  })
+  private readonly removePromptFx = this.domain.effect<IPromptEntity, void>({
+    name: 'removePromptFx',
+    handler: (props) => {
+      client.models.Prompts.delete({ id: props.id })
+    },
+  })
+  private readonly editPromptFx = this.domain.effect<EditPromptProps, void>({
+    name: 'editPromptFx',
+    handler: (props) => {
+      client.models.Prompts.update({
+        id: props.prompt.id,
+        ...props.updates,
+      })
+    },
   })
 
   public constructor() {
     sample({ clock: this.promptAdded, target: this.addPromptFx })
+    sample({ clock: this.promptRemoved, target: this.removePromptFx })
+    sample({ clock: this.promptEdited, target: this.editPromptFx })
   }
 
   private currentSubscription: Subscription | null = null
@@ -128,7 +92,10 @@ export class PromptsBuilderModel {
     if (this.currentSubscription) return
     console.log(client.models)
     const subscription = client.models.Prompts.observeQuery().subscribe({
-      next: (data) => this.promptChanged(data.items as any),
+      next: (data) => {
+        console.log(data)
+        this.promptChanged(data.items as any)
+      },
     })
     this.currentSubscription = subscription
     return () => {

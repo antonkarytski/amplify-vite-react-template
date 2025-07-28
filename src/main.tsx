@@ -2,7 +2,9 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import './styles.css'
 import './styles/globals.css'
+import '@aws-amplify/ui-react/styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { Authenticator } from '@aws-amplify/ui-react'
 import App from './App.tsx'
 
 import outputs from '../amplify_outputs.json'
@@ -15,7 +17,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <App />
+      <Authenticator>
+        <App />
+      </Authenticator>
     </StrictMode>,
   )
 }

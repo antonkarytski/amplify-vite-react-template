@@ -4,6 +4,7 @@ import { SidebarContainer } from './SidebarContainer'
 import { sidebarConfig } from './sidebarConfig'
 import { Button } from '../../ui/Button'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { LogoutButton } from '../auth/LogoutButton'
 
 export function AppSidebar() {
   const navigate = useNavigate()
@@ -33,7 +34,9 @@ export function AppSidebar() {
             )
           })}
         </SidebarGroup>
-        <SidebarGroup />
+        <SidebarGroup className={'mt-auto'}>
+          <LogoutButton />
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />
     </SidebarContainer>
